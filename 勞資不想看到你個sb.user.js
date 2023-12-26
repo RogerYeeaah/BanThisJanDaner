@@ -13,17 +13,17 @@
 (function () {
     //定義unban函式
     function unban(e) {
-        // 获取 li 元素
+        // 獲取 li 元素
         var li = e.parentNode.parentNode.parentNode;
         var total = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0]
-        // 获取作者姓名
+        // 獲取作者姓名
         var author = total.textContent;
-        // 获取防伪码
-        var privCode = total.getAttribute('title').split('防伪码：').pop();
+        // 獲取防偽碼
+        var privCode = total.getAttribute('title').split('防偽碼：').pop();
 
-        // 确认是否解除屏蔽
-        if (confirm("讓我看看 " + author + " 這傢伙有什麼長進")) {
-            // 从 localStorage 中删除 banCodeObj 对象中 author.textContent 对应的键值对
+        // 確認是否解除屏蔽
+        if (confirm("讓我看看 " + author + " 這傢夥有什麼長進")) {
+            // 從 localStorage 中刪除 banCodeObj 對象中 author.textContent 對應的鍵值對
             const banCodeObj = JSON.parse(localStorage.getItem('banCode'));
             if (banCodeObj[author]) {
                 delete banCodeObj[author];
@@ -38,7 +38,7 @@
     function ban(e) {
         var li = e.parentNode.parentNode.parentNode;
         var author = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
-        var privCode = $(author).attr('title').split('防伪码：').pop();
+        var privCode = $(author).attr('title').split('防偽碼：').pop();
         if (confirm("您確定要屏蔽 " + author.textContent + " 嗎？")) {
             const banCodeObj = JSON.parse(localStorage.getItem('banCode'));
             banCodeObj[author.textContent] = privCode;
@@ -63,7 +63,7 @@
         var author = lis[i].getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
         for (var j = 0; j < banCodeKeys; ++j) {
             var name = $(author)[0].innerHTML;
-            var privCode = $(author).attr('title').split('防伪码：').pop();
+            var privCode = $(author).attr('title').split('防偽碼：').pop();
             if (privCode === Object.entries(banCode)[j][1]) {
                 lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del>`;
                 break
@@ -76,14 +76,14 @@
         var button = document.createElement("a");
 
 
-        if(row[x].innerHTML.includes('del')) {
+        if (row[x].innerHTML.includes('del')) {
             button.textContent = "[解除屏蔽]";
-            button.addEventListener("click", function() {
+            button.addEventListener("click", function () {
                 unban(this);
             });
         } else {
             button.textContent = "[屏蔽]";
-            button.addEventListener("click", function() {
+            button.addEventListener("click", function () {
                 ban(this);
             });
         }
