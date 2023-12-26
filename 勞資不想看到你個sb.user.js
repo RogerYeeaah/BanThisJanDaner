@@ -9,7 +9,6 @@
 // @grant        none
 // ==/UserScript==
 
-
 (function () {
     //定義unban函式
     function unban(e) {
