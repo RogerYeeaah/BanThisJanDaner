@@ -19,7 +19,7 @@
         // 獲取作者姓名
         var author = total.textContent;
         // 獲取防偽碼
-        var privCode = total.getAttribute('title').split('防偽碼：').pop();
+        var privCode = total.getAttribute('title').split('防伪码：').pop();
 
         // 確認是否解除屏蔽
         if (confirm("讓我看看 " + author + " 這傢夥有什麼長進")) {
@@ -38,7 +38,7 @@
     function ban(e) {
         var li = e.parentNode.parentNode.parentNode;
         var author = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
-        var privCode = $(author).attr('title').split('防偽碼：').pop();
+        var privCode = $(author).attr('title').split('防伪码：').pop();
         if (confirm("您確定要屏蔽 " + author.textContent + " 嗎？")) {
             const banCodeObj = JSON.parse(localStorage.getItem('banCode'));
             banCodeObj[author.textContent] = privCode;
@@ -63,7 +63,7 @@
         var author = lis[i].getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
         for (var j = 0; j < banCodeKeys; ++j) {
             var name = $(author)[0].innerHTML;
-            var privCode = $(author).attr('title').split('防偽碼：').pop();
+            var privCode = $(author).attr('title').split('防伪码：').pop();
             if (privCode === Object.entries(banCode)[j][1]) {
                 lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del>`;
                 break
