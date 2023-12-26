@@ -1,0 +1,95 @@
+// ==UserScript==
+// @name         勞資不想看到你個sb
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        *://jandan.net/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=jandan.net
+// @grant        none
+// ==/UserScript==
+
+
+(function () {
+    //定義unban函式
+    function unban(e) {
+        // 获取 li 元素
+        var li = e.parentNode.parentNode.parentNode;
+        var total = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0]
+        // 获取作者姓名
+        var author = total.textContent;
+        // 获取防伪码
+        var privCode = total.getAttribute('title').split('防伪码：').pop();
+
+        // 确认是否解除屏蔽
+        if (confirm("讓我看看 " + author + " 這傢伙有什麼長進")) {
+            // 从 localStorage 中删除 banCodeObj 对象中 author.textContent 对应的键值对
+            const banCodeObj = JSON.parse(localStorage.getItem('banCode'));
+            if (banCodeObj[author]) {
+                delete banCodeObj[author];
+                localStorage.setItem('banCode', JSON.stringify(banCodeObj));
+                location.reload();
+            }
+        }
+        location.reload();
+    }
+
+    // 定義 ban() 函式
+    function ban(e) {
+        var li = e.parentNode.parentNode.parentNode;
+        var author = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
+        var privCode = $(author).attr('title').split('防伪码：').pop();
+        if (confirm("您確定要屏蔽 " + author.textContent + " 嗎？")) {
+            const banCodeObj = JSON.parse(localStorage.getItem('banCode'));
+            banCodeObj[author.textContent] = privCode;
+            localStorage.setItem('banCode', JSON.stringify(banCodeObj));
+            location.reload();
+        }
+    }
+
+    localStorage.getItem('banCode') == undefined ? localStorage.setItem('banCode', '{}') : console.log('Here is who you ban: ' + localStorage.getItem('banCode'))
+    var banCode = JSON.parse(localStorage.getItem('banCode'))
+    var banCodeKeys = Object.keys(banCode).length;
+    var comment = document.getElementsByClassName("commentlist");
+    var lis = comment[0].getElementsByTagName("li");
+
+    // 定義屏蔽按鈕
+    var voteElements = document.querySelectorAll(".jandan-vote");
+    // 定位解除屏蔽
+    var row = document.querySelectorAll('.text')
+
+    // 屏蔽防偽碼標記用戶
+    for (var i = lis.length - 1; i >= 0; --i) {
+        var author = lis[i].getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
+        for (var j = 0; j < banCodeKeys; ++j) {
+            var name = $(author)[0].innerHTML;
+            var privCode = $(author).attr('title').split('防伪码：').pop();
+            if (privCode === Object.entries(banCode)[j][1]) {
+                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del>`;
+                break
+            }
+        }
+    }
+
+    // 遍歷所有 .jandan-vote 元素
+    for (var x = 0; x < voteElements.length; x++) {
+        var button = document.createElement("a");
+
+
+        if(row[x].innerHTML.includes('del')) {
+            button.textContent = "[解除屏蔽]";
+            button.addEventListener("click", function() {
+                unban(this);
+            });
+        } else {
+            button.textContent = "[屏蔽]";
+            button.addEventListener("click", function() {
+                ban(this);
+            });
+        }
+
+        button.style.color = "#c8c7cc";
+        voteElements[x].prepend(button);
+    }
+
+})();
