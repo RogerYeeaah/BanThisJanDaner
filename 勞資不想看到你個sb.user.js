@@ -54,8 +54,6 @@
 
     // 定義屏蔽按鈕
     var voteElements = document.querySelectorAll(".jandan-vote");
-    // 定位解除屏蔽
-    var row = document.querySelectorAll('.text')
 
     // 屏蔽防偽碼標記用戶
     for (var i = lis.length - 1; i >= 0; --i) {
