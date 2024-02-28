@@ -10,6 +10,17 @@
 // ==/UserScript==
 
 (function () {
+    localStorage.getItem('banCode') == undefined ? localStorage.setItem('banCode', '{}') : console.log('Here is who you ban: ' + localStorage.getItem('banCode'))
+    var banCode = JSON.parse(localStorage.getItem('banCode'))
+    var banCodeKeys = Object.keys(banCode).length
+    var comment = document.getElementsByClassName("commentlist")
+    var lis = comment[0].getElementsByTagName("li")
+    var row = document.querySelectorAll('.text')
+
+
+    // 定義屏蔽按鈕
+    var voteElements = document.querySelectorAll(".jandan-vote")
+
     //定義unban函式
     function unban(e) {
         // 獲取 li 元素
@@ -46,24 +57,6 @@
         }
     }
 
-    // tooltip觸發
-    function showTooltip() {
-        // 定義 Tooltip 變數
-        var Tooltip = "This is a tooltip.";
-      
-        // 使用 Tooltip 變數
-        console.log(Tooltip);
-      }
-
-    localStorage.getItem('banCode') == undefined ? localStorage.setItem('banCode', '{}') : console.log('Here is who you ban: ' + localStorage.getItem('banCode'))
-    var banCode = JSON.parse(localStorage.getItem('banCode'))
-    var banCodeKeys = Object.keys(banCode).length;
-    var comment = document.getElementsByClassName("commentlist");
-    var lis = comment[0].getElementsByTagName("li");
-
-    // 定義屏蔽按鈕
-    var voteElements = document.querySelectorAll(".jandan-vote");
-
     // 屏蔽防偽碼標記用戶
     for (var i = lis.length - 1; i >= 0; --i) {
         var author = lis[i].getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
@@ -73,7 +66,7 @@
             if (privCode === Object.entries(banCode)[j][1]) {
                 var contentBox = lis[i].getElementsByClassName("text")
                 var content = $(contentBox).find('p:not(.bad_content)')[0].innerHTML.split('<br>').join()
-                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(鼠標懸停)</i>`;
+                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del><i title="${content}" style="display: inline-block; font-size: 10px; ">懸停偷看一下(鼠標懸停)</i>`;
                 break
             }
         }
@@ -82,7 +75,6 @@
     // 遍歷所有 .jandan-vote 元素
     for (var x = 0; x < voteElements.length; x++) {
         var button = document.createElement("a");
-
 
         if (row[x].innerHTML.includes('del')) {
             button.textContent = "[解除屏蔽]";
