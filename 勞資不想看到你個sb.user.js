@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.01
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -28,8 +28,6 @@
         var total = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0]
         // 獲取作者姓名
         var author = total.textContent;
-        // 獲取防偽碼
-        var privCode = total.getAttribute('title').split('防伪码：').pop();
 
         // 確認是否解除屏蔽
         if (confirm("讓我看看 " + author + " 這傢夥有什麼長進")) {
@@ -66,7 +64,7 @@
             if (privCode === Object.entries(banCode)[j][1]) {
                 var contentBox = lis[i].getElementsByClassName("text")
                 var content = $(contentBox).find('p:not(.bad_content)')[0].innerHTML.split('<br>').join()
-                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del><i title="${content}" style="display: inline-block; font-size: 10px; ">懸停偷看一下(鼠標懸停)</i>`;
+                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
                 break
             }
         }
@@ -91,5 +89,4 @@
         button.style.color = "#c8c7cc";
         voteElements[x].prepend(button);
     }
-
 })();
