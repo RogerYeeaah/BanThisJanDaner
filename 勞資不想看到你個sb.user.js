@@ -46,6 +46,15 @@
         }
     }
 
+    // tooltip觸發
+    function showTooltip() {
+        // 定義 Tooltip 變數
+        var Tooltip = "This is a tooltip.";
+      
+        // 使用 Tooltip 變數
+        console.log(Tooltip);
+      }
+
     localStorage.getItem('banCode') == undefined ? localStorage.setItem('banCode', '{}') : console.log('Here is who you ban: ' + localStorage.getItem('banCode'))
     var banCode = JSON.parse(localStorage.getItem('banCode'))
     var banCodeKeys = Object.keys(banCode).length;
@@ -62,7 +71,9 @@
             var name = $(author)[0].innerHTML;
             var privCode = $(author).attr('title').split('防伪码：').pop();
             if (privCode === Object.entries(banCode)[j][1]) {
-                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del>`;
+                var contentBox = lis[i].getElementsByClassName("text")
+                var content = $(contentBox).find('p:not(.bad_content)')[0].innerHTML.split('<br>').join()
+                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;">${name} - 已屏蔽</del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(鼠標懸停)</i>`;
                 break
             }
         }
