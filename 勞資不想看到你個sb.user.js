@@ -7,7 +7,9 @@
 // @match        *://jandan.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=jandan.net
 // @grant        none
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
+
 
 (function () {
     // 檢查 localStorage 中是否存在 banCode 鍵值對 , 若不存在則新增一個空物件
