@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.13
+// @version      1.14
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -149,7 +149,7 @@
     // 生成list按鈕Dom
     var counter = Object.keys(banCode).length
     var listDom = `
-            <div class="ban-list" style="display: flex; justify-content: flex-end; position: fixed; top: 84px; right: 50%; width: 1184px; max-height: calc(100% - 300px); transform: translateX(-50%); pointer-events: none">
+            <div class="ban-list" style="display: flex; justify-content: flex-end; position: fixed; top: 84px; left: 50%; width: 1184px; max-height: calc(100% - 300px); transform: translateX(-50%); pointer-events: none">
                 <a class="toggleList" style="padding: 5px; position: relative; text-align: center; border-radius: 5px; background: #bababa; color: white; font-weight: bold; pointer-events: auto;">屏蔽列表 <span style="display: inline-block; width: 20px; height: 20px">+</span><span style="position: absolute; width: 20px; height: 20px; top: 5px; right: 5px; background: #bababa; display: none;">-</span></a>
                 <ul style="margin-bottom: 3px; position: absolute; width: 90px; top: calc(100% + 10px); display: none; color: gray; overflow: hidden;">
     `
