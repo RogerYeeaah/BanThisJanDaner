@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.04
+// @version      1.05
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -28,11 +28,10 @@
     // 獲取網頁中的所有 .text 元素
     var row = document.querySelectorAll('.text')
 
-
     // 定義屏蔽按鈕
     var voteElements = document.querySelectorAll(".jandan-vote")
 
-    //定義unban函式
+    //定義 unban 函式
     function unban(e) {
         // 獲取 li 元素
         var li = e.parentNode.parentNode.parentNode;
@@ -53,8 +52,7 @@
         }
     }
 
-
-    // 定義 ban() 函式
+    // 定義 ban 函式
     function ban(e) {
         // 獲取 li 元素
         var li = e.parentNode.parentNode.parentNode;
@@ -100,35 +98,60 @@
         }
     }
 
-
     // 遍歷所有 .jandan-vote 元素
-for (var x = 0; x < voteElements.length; x++) {
-    // 創建一個新的 a 元素
-    var button = document.createElement("a");
+    for (var x = 0; x < voteElements.length; x++) {
+        // 創建一個新的 a 元素
+        var button = document.createElement("a");
 
-    // 若評論內容包含 "[已屏蔽]" 標記
-    if (row[x].innerHTML.includes('del')) {
-        // 設定按鈕文字為 "[解除屏蔽]"
-        button.textContent = "[解除屏蔽]";
+        // 若評論內容包含 "[已屏蔽]" 標記
+        if (row[x].innerHTML.includes('del')) {
+            // 設定按鈕文字為 "[解除屏蔽]"
+            button.textContent = "[解除屏蔽]";
 
-        // 為按鈕添加點擊解除屏蔽函式
-        button.addEventListener("click", function () {
-            unban(this);
-        });
-    } else {
-        // 設定按鈕文字為 "[屏蔽]"
-        button.textContent = "[屏蔽]";
+            // 為按鈕添加點擊解除屏蔽函式
+            button.addEventListener("click", function () {
+                unban(this);
+            });
+        } else {
+            // 設定按鈕文字為 "[屏蔽]"
+            button.textContent = "[屏蔽]";
 
-        // 為按鈕添加點擊屏蔽函式
-        button.addEventListener("click", function () {
-            ban(this);
-        });
+            // 為按鈕添加點擊屏蔽函式
+            button.addEventListener("click", function () {
+                ban(this);
+            });
+        }
+
+        // 設定按鈕顏色為 "#c8c7cc"
+        button.style.color = "#c8c7cc";
+
+        // 將按鈕插入到 .jandan-vote 元素的開頭
+        voteElements[x].prepend(button);
     }
 
-    // 設定按鈕顏色為 "#c8c7cc"
-    button.style.color = "#c8c7cc";
+    // 生成list按鈕Dom
+    var counter = Object.keys(banCode).length
+    var listDom = `
+        <div class="ban-list" style="padding: 5px; position: fixed; top: 84px; left: calc(100% - 180px); min-width: 100px; max-height: calc(100% - 300px); border-radius: 5px; background: #bababa;">
+            <a class="toggleList" style="position: relative; text-align: center; color: white; font-weight: bold">屏蔽列表 <span style="display: inline-block; width: 20px; height: 20px">+</span><span style="position: absolute; width: 20px; height: 20px; top: 0px; right: 0px; opacity: 0;">-</span></a>
+            <ul style="margin-bottom: 3px; position: absolute; width: calc(100% - 6px); top: calc(100% + 10px); display: none; color: gray; overflow: hidden;">
+    `
 
-    // 將按鈕插入到 .jandan-vote 元素的開頭
-    voteElements[x].prepend(button);
-}
+    for (var li = 0; li < counter; li++) {
+        listDom += `
+            <li style="margin-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]}</li>
+        `
+    }
+
+    listDom += `
+            </ul>
+        </div>
+    `
+
+    $('#wrapper').append(listDom)
+
+    const toggleList = document.querySelector('.ban-list')
+    toggleList.addEventListener('click', function() {
+        $($(this).find('ul')).toggle()
+    })
 })();
