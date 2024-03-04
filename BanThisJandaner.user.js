@@ -156,7 +156,7 @@
 
     for (var li = 0; li < counter; li++) {
         listDom += `
-            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]} <a class="delete" style="pointer-events: auto" onclick="unBenUser('${Object.keys(banCode)[li]}')">x</a></li>
+            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]} <a class="delete" style="pointer-events: auto; cursor: pointer;" onclick="unBenUser('${Object.keys(banCode)[li]}')">x</a></li>
         `
     }
 
