@@ -92,7 +92,7 @@
                 var content = $(contentBox).find('p:not(.bad_content)')[0].innerHTML.split('<br>').join()
 
                 // 將評論內容替換為 "[已屏蔽]" 標記
-                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;"><span class="math-inline">\{author\.textContent\} \- 已屏蔽</del\><i title\="</span>{content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
+                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;"><span class="math-inline">${author.textContent} - 已屏蔽</span></del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
 
                 // 跳出內層迴圈
                 break
