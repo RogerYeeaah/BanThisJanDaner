@@ -1,5 +1,3 @@
-/* globals jQuery, $, waitForKeyElements */
-
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
@@ -9,7 +7,6 @@
 // @match        *://jandan.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=jandan.net
 // @grant        none
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 
