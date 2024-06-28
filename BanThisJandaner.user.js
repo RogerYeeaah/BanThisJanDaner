@@ -3,7 +3,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.16
+// @version      1.17
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -79,7 +79,7 @@
     }
 
     // 定義 unBanUser 函式
-    $(document).ready(function() {
+    window.addEventListener('DOMContentLoaded', function() {
         window.unBenUser = function(e) {
         // 確認是否解除屏蔽
         if (confirm("讓我看看 " + e + " 這傢夥有什麼長進")) {
