@@ -1,3 +1,5 @@
+/* globals jQuery, $, waitForKeyElements */
+
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
