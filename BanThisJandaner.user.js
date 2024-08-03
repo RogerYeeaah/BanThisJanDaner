@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.17
+// @version      1.18
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=jandan.net
 // @grant        none
+// @downloadURL https://update.greasyfork.org/scripts/483130/%E5%8B%9E%E8%B3%87%E4%B8%8D%E6%83%B3%E7%9C%8B%E5%88%B0%E4%BD%A0%E5%80%8Bsb.user.js
+// @updateURL https://update.greasyfork.org/scripts/483130/%E5%8B%9E%E8%B3%87%E4%B8%8D%E6%83%B3%E7%9C%8B%E5%88%B0%E4%BD%A0%E5%80%8Bsb.meta.js
 // ==/UserScript==
 
 
@@ -54,13 +56,13 @@
     // 定義 ban 函式
     function ban(e) {
         // 獲取 li 元素
-        var li = e.parentNode.parentNode.parentNode;
+        var li = document.getElementsByClassName("commentlist")[0];
 
         // 獲取作者姓名
-        var author = li.getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
+        var author = li.getElementsByClassName("author")[0].children[0];
 
         // 獲取作者防偽碼
-        var privCode = $(author).attr('title').split('防伪码：').pop();
+        var privCode = author.getAttribute('title').split('防伪码：').pop();
 
         // 確認是否屏蔽
         if (confirm("您確定要屏蔽 " + author.textContent + " 嗎？")) {
@@ -76,8 +78,7 @@
     }
 
     // 定義 unBanUser 函式
-    window.addEventListener('DOMContentLoaded', function() {
-        window.unBenUser = function(e) {
+    function unBanUser(e) {
         // 確認是否解除屏蔽
         if (confirm("讓我看看 " + e + " 這傢夥有什麼長進")) {
             // 從 banCode 物件中刪除 author 對應的鍵值對
@@ -89,27 +90,27 @@
             // 重新載入頁面
             location.reload();
         }
-        };
-    });
+    }
 
     // 屏蔽防偽碼標記用戶
-    for (var i = lis.length - 1; i >= 0; --i) {
+    for (let i = lis.length - 1; i >= 0; i--) {
         // 獲取作者姓名
-        var author = lis[i].getElementsByClassName("author")[0].getElementsByTagName("strong")[0];
+        const author = lis[i].querySelector(".author strong");
+        const authorName = author ? author.innerText : '';
+
 
         // 遍歷 banCode 物件中的所有鍵值對
-        for (var j = 0; j < banCodeKeys; ++j) {
+        for (const [bannedAuthor, _] of Object.entries(banCode)) {
             // 若作者姓名與 banCode 物件中的鍵值對匹配
-            if (author.textContent === Object.entries(banCode)[j][0]) {
+            if (authorName === bannedAuthor) {
                 // 獲取評論內容
-                var contentBox = lis[i].getElementsByClassName("text")
-                var content = $(contentBox).find('p:not(.bad_content)')[0].innerHTML.split('<br>').join()
+                const contentBox = lis[i].querySelector(".text");
+                const content = contentBox.querySelector('p:not(.bad_content)').textContent.replace(/<br>/g, ' ');
 
                 // 將評論內容替換為 "[已屏蔽]" 標記
-                lis[i].getElementsByClassName("text")[0].innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;"><span class="math-inline">${author.textContent} - 已屏蔽</span></del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
+                contentBox.innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;"><span class="math-inline">${authorName} - 已屏蔽</span></del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
 
-                // 跳出內層迴圈
-                break
+                break;
             }
         }
     }
@@ -153,9 +154,10 @@
                 <ul style="margin-bottom: 3px; position: absolute; width: 90px; top: calc(100% + 10px); display: none; color: gray; overflow: hidden;">
     `
 
+    // 循环遍历 banCode 对象中的已屏蔽用户
     for (var li = 0; li < counter; li++) {
         listDom += `
-            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]} <a class="delete" style="pointer-events: auto; cursor: pointer;" onclick="unBenUser('${Object.keys(banCode)[li]}')">x</a></li>
+            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]} <a class="delete" href="javascript: void();" style="pointer-events: auto; cursor: pointer;">x</a></li>
         `
     }
 
@@ -164,11 +166,29 @@
             </div>
     `
 
-    $('#wrapper').append(listDom)
+    // 获取 DOM 元素
+    const wrapper = document.getElementById('wrapper');
+    const listDomElement = document.createElement('div');
+    listDomElement.innerHTML = listDom;
+    wrapper.appendChild(listDomElement);
 
-    const toggleList = document.querySelector('.ban-list')
+    // 添加点击事件监听器，用于处理删除按钮的点击
+    wrapper.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete')) {
+            const username = event.target.parentNode.textContent.trim().replace(' x', '');
+            unBanUser(username);
+        }
+    });
+
+    // 获取并缓存屏蔽用户列表 DOM 元素
+    const toggleList = document.querySelector('.ban-list');
+
+    // 添加点击事件监听器，用于展开/收起屏蔽用户列表
     toggleList.addEventListener('click', function() {
-        $($(this).find('span:nth-of-type(2)')).toggle()
-        $($(this).find('ul')).toggle()
-    })
+        const secondSpan = this.querySelector('span:nth-of-type(2)');
+        const ul = this.querySelector('ul');
+
+        secondSpan.style.display = secondSpan.style.display === 'none' ? 'block' : 'none';
+        ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+    });
 })();
