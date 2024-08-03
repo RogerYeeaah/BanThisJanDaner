@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.18
+// @version      1.19
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -56,7 +56,7 @@
     // 定義 ban 函式
     function ban(e) {
         // 獲取 li 元素
-        var li = document.getElementsByClassName("commentlist")[0];
+        var li = e.parentNode.parentNode.parentNode;
 
         // 獲取作者姓名
         var author = li.getElementsByClassName("author")[0].children[0];
