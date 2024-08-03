@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.19
+// @version      1.20
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -157,7 +157,7 @@
     // 循环遍历 banCode 对象中的已屏蔽用户
     for (var li = 0; li < counter; li++) {
         listDom += `
-            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;">${Object.keys(banCode)[li]} <a class="delete" href="javascript: void();" style="pointer-events: auto; cursor: pointer;">x</a></li>
+            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden; max-width: 100%; padding-right: 20px; box-sizing: border-box;">${Object.keys(banCode)[li]} <a class="delete" href="javascript: void();" style="pointer-events: auto; cursor: pointer; position: absolute; right: 0;">x</a></li>
         `
     }
 
