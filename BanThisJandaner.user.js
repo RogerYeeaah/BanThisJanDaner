@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.22
+// @version      1.23
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -31,6 +31,10 @@
 
     // 定義屏蔽按鈕
     var voteElements = document.querySelectorAll(".jandan-vote")
+
+    // document.getElementsByClassName("commentlist").getElementsByClassName("row").style.overflow = 'visible';
+    // console.log(document.getElementsByClassName("commentlist")[0])
+
 
     //定義 unban 函式
     function unban(e) {
@@ -105,10 +109,11 @@
             if (authorName === bannedAuthor) {
                 // 獲取評論內容
                 const contentBox = lis[i].querySelector(".text");
+                const img = lis[i].querySelector("img");
                 const content = contentBox.querySelector('p:not(.bad_content)').textContent.replace(/<br>/g, ' ');
 
                 // 將評論內容替換為 "[已屏蔽]" 標記
-                contentBox.innerHTML = `<del style="display: inline-block; margin-bottom: 20px; margin-top: 7px; margin-right: 5px;"><span class="math-inline">${authorName} - 已屏蔽</span></del><i title="${content}" style="display: inline-block; font-size: 10px; ">偷看一下(懸停)</i>`;
+                contentBox.innerHTML = `<del class="delete"><span class="math-inline">${authorName} - 已屏蔽</span></del><i class="peep" title="${content}">偷看一下(懸停) ${img != null ? `<img style="opacity: 0;" src="${img.src}" alt="pic" />`: ''}</i>`;
 
                 break;
             }
@@ -149,15 +154,15 @@
     // 生成list按鈕Dom
     var counter = Object.keys(banCode).length
     var listDom = `
-            <div class="ban-list" style="display: flex; flex-wrap: wrap; justify-content: flex-end; position: fixed; top: 84px; width: 1184px; pointer-events: none; width: calc((100vw - 984px - 60px) / 2); max-height: calc(100% - 300px); box-sizing: border-box; left: calc(100% - (100vw - 984px - 30px) / 2);">
-                <a class="toggleList" style="padding: 5px; position: relative; text-align: center; width: 100%; border-radius: 5px; background: #bababa; color: white; font-weight: bold; pointer-events: auto;">屏蔽列表 <span style="display: inline-block; width: 20px; height: 20px">+</span><span style="position: absolute; width: 20px; height: 20px; top: 5px; right: 5px; background: #bababa; display: none;">-</span></a>
-                <ul style="margin-bottom: 3px; position: relative; width: 90px; top: calc(100% + 10px); display: none; width: 100%; color: gray; overflow: auto; height: calc(100vh - 196px);">
+            <div class="banList">
+                <a class="toggleList">屏蔽列表 <span class="toggleList-show">+</span><span class="toggleList-hide">-</span></a>
+                <ul class="mainList">
     `
 
     // 循环遍历 banCode 对象中的已屏蔽用户
     for (var li = 0; li < counter; li++) {
         listDom += `
-            <li style="margin-bottom: 4px; padding-bottom: 4px; width: 100%; border-bottom: 1px solid gray; font-size: 12px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden; max-width: 100%; padding-right: 20px; box-sizing: border-box;">${Object.keys(banCode)[li]} <a class="delete" href="javascript: void();" style="pointer-events: auto; cursor: pointer; position: absolute; right: 0;">x</a></li>
+            <li class="mainList-item">${Object.keys(banCode)[li]} <a class="unban" href="javascript: void();">x</a></li>
         `
     }
 
@@ -174,21 +179,138 @@
 
     // 添加点击事件监听器，用于处理删除按钮的点击
     wrapper.addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete')) {
+        if (event.target.classList.contains('unban')) {
             const username = event.target.parentNode.textContent.trim().replace(' x', '');
             unBanUser(username);
         }
     });
 
     // 获取并缓存屏蔽用户列表 DOM 元素
-    const toggleList = document.querySelector('.ban-list');
+    const toggleList = document.querySelector('.banList');
+    if(toggleList != null) {
+        // 添加点击事件监听器，用于展开/收起屏蔽用户列表
+        toggleList.addEventListener('click', function() {
+            const secondSpan = this.querySelector('span:nth-of-type(2)');
+            const ul = this.querySelector('ul');
 
-    // 添加点击事件监听器，用于展开/收起屏蔽用户列表
-    toggleList.addEventListener('click', function() {
-        const secondSpan = this.querySelector('span:nth-of-type(2)');
-        const ul = this.querySelector('ul');
+            secondSpan.style.display = secondSpan.style.display === 'none' ? 'block' : 'none';
+            ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+        });
+    }
 
-        secondSpan.style.display = secondSpan.style.display === 'none' ? 'block' : 'none';
-        ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
-    });
+    setTimeout(() => {
+        // 创建 style 元素
+        var style = document.createElement('style');
+         // 创建文本节点，包含 CSS 规则
+        style.innerHTML = `
+            .commentlist .row {
+                overflow: visible;
+            }
+
+            .delete {
+                display: inline-block;
+                margin-bottom: 20px;
+                margin-top: 7px;
+                margin-right: 5px;
+            }
+
+            .peep {
+                display: inline-block;
+                position: relative;
+                font-size: 10px;
+            }
+
+            .peep img {
+                position: absolute;
+                left: calc(100% + 10px);
+                opacity: 0;
+                max-width: 250px !important;
+                pointer-events: none;
+            }
+
+            .peep:hover img{
+                opacity: 1 !important;
+                transition: .5s ease;
+            }
+
+            .banList {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                position: fixed;
+                top: 84px;
+                width: 1184px;
+                pointer-events: none;
+                width: calc((100vw - 984px - 60px) / 2);
+                max-height: calc(100% - 300px);
+                box-sizing: border-box;
+                left: calc(100% - (100vw - 984px - 30px) / 2);
+            }
+
+            .toggleList {
+                padding: 5px;
+                position: relative;
+                text-align: center;
+                width: 100%;
+                border-radius: 5px;
+                background: #bababa;
+                color: white;
+                font-weight: bold;
+                pointer-events: auto;
+            }
+
+            .toggleList-show {
+                display: inline-block;
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                right: 5px;
+            }
+
+            .toggleList-hide {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 5px;
+                right: 5px;
+                background: #bababa;
+                display: none;
+            }
+
+            .mainList {
+                margin-bottom: 3px;
+                position: relative;
+                width: 90px;
+                top: calc(100% + 10px);
+                display: none;
+                width: 100%;
+                color: gray;
+                overflow: auto;
+                height: calc(100vh - 196px);
+            }
+
+            .mainList-item {
+                margin-bottom: 4px;
+                padding-bottom: 4px;
+                width: 100%;
+                border-bottom: 1px solid gray;
+                font-size: 12px;
+                white-space:nowrap;
+                text-overflow:ellipsis;
+                -o-text-overflow:ellipsis;
+                overflow: hidden;
+                max-width: 100%;
+                padding-right: 20px;
+                box-sizing: border-box;
+            }
+
+            .unban {
+                pointer-events: auto;
+                cursor: pointer;
+                position: absolute;
+                right: 0;
+            }
+        `;
+        document.head.appendChild(style);
+    }, 1);
 })();
