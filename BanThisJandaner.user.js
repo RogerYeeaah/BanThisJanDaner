@@ -103,19 +103,11 @@
         // 遍歷鍵名陣列，同時取得索引
         for (let i = 0; i < keys.length; i++) {
             const item = keys[i];
-<<<<<<< Updated upstream
-            tucaoRows.forEach(tucaoRow => {
-                const tucaoAuthor = document.querySelector('.tucao-author');
-                const textContent = tucaoAuthor.textContent;
-                textContent.indexOf(item) ? tucaoRow.remove() : '';
-            });
-=======
             for(let ri = 0; ri < tucaoRows.length; ri++) {
                 const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
                 const textContent = tucaoAuthor.textContent;
                 textContent.includes(item) ? tucaoRows[ri].remove() : '';
             }
->>>>>>> Stashed changes
         }
     }
 
@@ -214,11 +206,7 @@
                     tucaoHandle(tucaoBox);
                     clearInterval(intervalBox);
                 }
-<<<<<<< Updated upstream
-            }, 200);
-=======
             }, 100);
->>>>>>> Stashed changes
         }
     });
 
