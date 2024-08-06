@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.23
+// @version      1.24
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -19,9 +19,6 @@
     // 將 localStorage 中的 banCode 鍵值對解析為 JSON 物件
     var banCode = JSON.parse(localStorage.getItem('banCode'))
 
-    // 計算 banCode 物件中的鍵值對數量
-    var banCodeKeys = Object.keys(banCode).length
-
     // 獲取網頁中的所有評論列表
     var comment = document.getElementsByClassName("commentlist")
     var lis = comment[0].getElementsByTagName("li")
@@ -32,8 +29,8 @@
     // 定義屏蔽按鈕
     var voteElements = document.querySelectorAll(".jandan-vote")
 
-    // document.getElementsByClassName("commentlist").getElementsByClassName("row").style.overflow = 'visible';
-    // console.log(document.getElementsByClassName("commentlist")[0])
+    // 定義吐槽按鈕
+    var tucao = document.querySelectorAll(".tucao-btn")
 
 
     //定義 unban 函式
@@ -93,6 +90,24 @@
 
             // 重新載入頁面
             location.reload();
+        }
+    }
+
+    function tucaoHandle(e) {
+        var tucaoRows = e.querySelectorAll('.tucao-row');
+        var banCode = JSON.parse(localStorage.getItem("banCode"));
+
+        // 取得所有鍵名並放入一個陣列
+        const keys = Object.keys(banCode);
+
+        // 遍歷鍵名陣列，同時取得索引
+        for (let i = 0; i < keys.length; i++) {
+            const item = keys[i];
+            tucaoRows.forEach(tucaoRow => {
+                const tucaoAuthor = document.querySelector('.tucao-author');
+                const textContent = tucaoAuthor.textContent;
+                textContent.indexOf(item) ? tucaoRow.remove() : '';
+            });
         }
     }
 
@@ -182,6 +197,16 @@
         if (event.target.classList.contains('unban')) {
             const username = event.target.parentNode.textContent.trim().replace(' x', '');
             unBanUser(username);
+        }
+        if (event.target.classList.contains('tucao-btn')) {
+            var tucaoId = event.target.dataset.id;
+            var tucaoBox = document.getElementById(`jandan-tucao-${tucaoId}`)
+            var intervalBox = setInterval(() => {
+                if (tucaoBox.innerText !== "数据加载中....biubiubiu....") {
+                    tucaoHandle(tucaoBox);
+                    clearInterval(intervalBox);
+                }
+            }, 200);
         }
     });
 
