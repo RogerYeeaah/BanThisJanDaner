@@ -1,7 +1,11 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
+<<<<<<< Updated upstream
 // @version      1.24
+=======
+// @version      1.26
+>>>>>>> Stashed changes
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -103,11 +107,19 @@
         // 遍歷鍵名陣列，同時取得索引
         for (let i = 0; i < keys.length; i++) {
             const item = keys[i];
+<<<<<<< Updated upstream
             tucaoRows.forEach(tucaoRow => {
                 const tucaoAuthor = document.querySelector('.tucao-author');
                 const textContent = tucaoAuthor.textContent;
                 textContent.indexOf(item) ? tucaoRow.remove() : '';
             });
+=======
+            for(let ri = 0; ri < tucaoRows.length; ri++) {
+                const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
+                const textContent = tucaoAuthor.textContent;
+                textContent.includes(item) ? tucaoRows[ri].remove() : '';
+            }
+>>>>>>> Stashed changes
         }
     }
 
@@ -206,7 +218,11 @@
                     tucaoHandle(tucaoBox);
                     clearInterval(intervalBox);
                 }
+<<<<<<< Updated upstream
             }, 200);
+=======
+            }, 100);
+>>>>>>> Stashed changes
         }
     });
 
