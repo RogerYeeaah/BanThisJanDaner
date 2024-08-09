@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.26
+// @version      1.27
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -106,7 +106,7 @@
             for(let ri = 0; ri < tucaoRows.length; ri++) {
                 const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
                 const textContent = tucaoAuthor.textContent;
-                textContent.includes(item) ? tucaoRows[ri].remove() : '';
+                (textContent.includes(item) && tucaoRows[ri].parentNode.className == 'tucao-hot') ? tucaoRows[ri].parentNode.remove() : textContent.includes(item) ? tucaoRows[ri].remove() : '';
             }
         }
     }
