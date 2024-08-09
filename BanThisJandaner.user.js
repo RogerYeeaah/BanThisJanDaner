@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.27
+// @version      1.28
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -94,7 +94,8 @@
     }
 
     function tucaoHandle(e) {
-        var tucaoRows = e.querySelectorAll('.tucao-row');
+        var tucaoRows = e.querySelectorAll('.tucao-list .tucao-row');
+        var tucaoHotRows = e.querySelectorAll('.tucao-hot .tucao-row');
         var banCode = JSON.parse(localStorage.getItem("banCode"));
 
         // 取得所有鍵名並放入一個陣列
@@ -103,11 +104,20 @@
         // 遍歷鍵名陣列，同時取得索引
         for (let i = 0; i < keys.length; i++) {
             const item = keys[i];
+            console.log(item)
             for(let ri = 0; ri < tucaoRows.length; ri++) {
                 const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
                 const textContent = tucaoAuthor.textContent;
-                (textContent.includes(item) && tucaoRows[ri].parentNode.className == 'tucao-hot') ? tucaoRows[ri].parentNode.remove() : textContent.includes(item) ? tucaoRows[ri].remove() : '';
+                textContent.includes(item) ? tucaoRows[ri].remove() : '';
             }
+            for(let hri = 0; hri < tucaoHotRows.length; hri++) {
+                const tucaoAuthor = tucaoHotRows[hri].querySelector('.tucao-author');
+                const textContent = tucaoAuthor.textContent;
+                if (textContent.includes(item)) {
+                    tucaoHotRows[tucaoHotRows.length === 1 ? 0 : hri].parentNode.remove();
+                }
+            }
+
         }
     }
 
