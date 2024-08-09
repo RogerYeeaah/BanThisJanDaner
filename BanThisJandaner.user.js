@@ -104,7 +104,6 @@
         // 遍歷鍵名陣列，同時取得索引
         for (let i = 0; i < keys.length; i++) {
             const item = keys[i];
-            console.log(item)
             for(let ri = 0; ri < tucaoRows.length; ri++) {
                 const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
                 const textContent = tucaoAuthor.textContent;
