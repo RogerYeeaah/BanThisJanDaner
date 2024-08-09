@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.28
+// @version      1.29
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -204,17 +204,19 @@
 
     // 添加点击事件监听器，用于处理删除按钮的点击
     wrapper.addEventListener('click', (event) => {
-        if (event.target.classList.contains('unban')) {
+        if (event.target.classList.contains('unban') && !event.target.classList.contains('clicked')) {
             const username = event.target.parentNode.textContent.trim().replace(' x', '');
             unBanUser(username);
+            event.target.classList.add('clicked')
         }
-        if (event.target.classList.contains('tucao-btn')) {
+        if (event.target.classList.contains('tucao-btn') && !event.target.classList.contains('clicked')) {
             var tucaoId = event.target.dataset.id;
             var tucaoBox = document.getElementById(`jandan-tucao-${tucaoId}`)
             var intervalBox = setInterval(() => {
                 if (tucaoBox.innerText !== "数据加载中....biubiubiu....") {
                     tucaoHandle(tucaoBox);
                     clearInterval(intervalBox);
+                    event.target.classList.add('clicked')
                 }
             }, 100);
         }
