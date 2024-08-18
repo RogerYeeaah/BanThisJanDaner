@@ -257,8 +257,6 @@
     const myInput = document.querySelector('.ban-input');
 
     myForm.addEventListener('submit', function(event) {
-        event.defaultPrevented();
-
         const inputValue = myInput.value;
 
         if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
