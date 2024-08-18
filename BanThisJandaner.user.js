@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.31
+// @version      1.32
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -257,6 +257,8 @@
     const myInput = document.querySelector('.ban-input');
 
     myForm.addEventListener('submit', function(event) {
+        event.defaultPrevented();
+
         const inputValue = myInput.value;
 
         if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
@@ -265,25 +267,12 @@
             if (!banData[inputValue]) { // 避免重複添加
                 banData[inputValue] = "";
                 localStorage.setItem("banCode", JSON.stringify(banData));
-                // ... 更新頁面顯示的邏輯（例如：使用 JavaScript 修改 DOM）
+                location.reload();
             } else {
                 alert("該用戶已經被屏蔽");
             }
         }
     });
-
-    // 手動屏蔽
-    function myCustomFunction(value) {
-        var banData = JSON.parse(localStorage.getItem("banCode"))
-
-        if(confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + value + " 嗎？")) {
-            banData[value] = "";
-            localStorage.setItem("banCode", JSON.stringify(banData));
-        }
-
-        // 重新載入頁面
-        location.reload();
-    }
 
     setTimeout(() => {
         // 创建 style 元素
