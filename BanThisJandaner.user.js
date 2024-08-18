@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.29
+// @version      1.3
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -14,10 +14,25 @@
 
 (function () {
     // 檢查 localStorage 中是否存在 banCode 鍵值對 , 若不存在則新增一個空物件
-    localStorage.getItem('banCode') == undefined ? localStorage.setItem('banCode', '{}') : console.log('Here is who you ban: ' + localStorage.getItem('banCode'))
+    const BAN_CODE_KEY = 'banCode';
+
+    function initializeBanCode() {
+        try {
+            const banCode = localStorage.getItem(BAN_CODE_KEY);
+            if (!banCode) {
+                localStorage.setItem(BAN_CODE_KEY, '{}');
+            } else {
+                console.log('Here is who you ban: ' + banCode);
+            }
+        } catch (error) {
+            console.error('Error accessing localStorage:', error);
+        }
+    }
+
+    initializeBanCode();
 
     // 將 localStorage 中的 banCode 鍵值對解析為 JSON 物件
-    var banCode = JSON.parse(localStorage.getItem('banCode'))
+    var banCode = JSON.parse(localStorage.getItem(BAN_CODE_KEY))
 
     // 獲取網頁中的所有評論列表
     var comment = document.getElementsByClassName("commentlist")
@@ -47,7 +62,7 @@
             delete banCode[author];
 
             // 將更新後的 banCode 物件存入 localStorage
-            localStorage.setItem('banCode', JSON.stringify(banCode));
+            localStorage.setItem(BAN_CODE_KEY, JSON.stringify(banCode));
 
             // 重新載入頁面
             location.reload();
@@ -71,7 +86,7 @@
             banCode[author.textContent] = privCode;
 
             // 將更新後的 banCode 物件存入 localStorage
-            localStorage.setItem('banCode', JSON.stringify(banCode));
+            localStorage.setItem(BAN_CODE_KEY, JSON.stringify(banCode));
 
             // 重新載入頁面
             location.reload();
@@ -86,7 +101,7 @@
             delete banCode[e];
 
             // 將更新後的 banCode 物件存入 localStorage
-            localStorage.setItem('banCode', JSON.stringify(banCode));
+            localStorage.setItem(BAN_CODE_KEY, JSON.stringify(banCode));
 
             // 重新載入頁面
             location.reload();
@@ -178,21 +193,24 @@
     // 生成list按鈕Dom
     var counter = Object.keys(banCode).length
     var listDom = `
-            <div class="banList">
-                <a class="toggleList">屏蔽列表 <span class="toggleList-show">+</span><span class="toggleList-hide">-</span></a>
-                <ul class="mainList">
+        <div class="banList">
+            <a class="toggleList">屏蔽列表 <span class="toggleList-show">+</span><span class="toggleList-hide">-</span></a>
+            <ul class="mainList">
     `
 
     // 循环遍历 banCode 对象中的已屏蔽用户
     for (var li = 0; li < counter; li++) {
         listDom += `
-            <li class="mainList-item">${Object.keys(banCode)[li]} <a class="unban" href="javascript: void();">x</a></li>
+                <li class="mainList-item">${Object.keys(banCode)[li]} <a class="unban" href="javascript: void();">x</a></li>
         `
     }
 
     listDom += `
-                </ul>
-            </div>
+            </ul>
+            <form id="banForm">
+                <input class="ban-input" type="text" placeholder="手動屏蔽" />
+            </form>
+        </div>
     `
 
     // 获取 DOM 元素
@@ -222,16 +240,51 @@
     });
 
     // 获取并缓存屏蔽用户列表 DOM 元素
-    const toggleList = document.querySelector('.banList');
+    const toggleList = document.querySelector('.toggleList');
     if(toggleList != null) {
         // 添加点击事件监听器，用于展开/收起屏蔽用户列表
         toggleList.addEventListener('click', function() {
             const secondSpan = this.querySelector('span:nth-of-type(2)');
-            const ul = this.querySelector('ul');
+            const ul = document.querySelector('.mainList');
 
             secondSpan.style.display = secondSpan.style.display === 'none' ? 'block' : 'none';
             ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
         });
+    }
+
+    // 手動屏蔽功能
+    const myForm = document.getElementById('banForm');
+    const myInput = document.querySelector('.ban-input');
+
+    myForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const inputValue = myInput.value;
+
+        if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
+            let banData = JSON.parse(localStorage.getItem("banCode")) || {}; // 初始化為空物件
+
+            if (!banData[inputValue]) { // 避免重複添加
+                banData[inputValue] = "";
+                localStorage.setItem("banCode", JSON.stringify(banData));
+                // ... 更新頁面顯示的邏輯（例如：使用 JavaScript 修改 DOM）
+            } else {
+                alert("該用戶已經被屏蔽");
+            }
+        }
+    });
+
+    // 手動屏蔽
+    function myCustomFunction(value) {
+        var banData = JSON.parse(localStorage.getItem("banCode"))
+
+        if(confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + value + " 嗎？")) {
+            banData[value] = "";
+            localStorage.setItem("banCode", JSON.stringify(banData));
+        }
+        setTimeout(() => {
+            location.reload();
+        }, 100)
     }
 
     setTimeout(() => {
@@ -345,6 +398,26 @@
                 cursor: pointer;
                 position: absolute;
                 right: 0;
+            }
+
+            #banForm {
+                position: absolute;
+                bottom: calc(100% + 5px);
+                left: 0;
+                width: 100%;
+                pointer-events: auto;
+            }
+            #banForm .ban-input {
+                position: relative;
+                width: 100%;
+                border-color: #d8d8d8;
+                border-width: 0px 00px 1px 0px;
+            }
+            #banForm .ban-input:focus {
+                outline: none;
+            }
+            #banForm .ban-input::placeholder {
+                color: #d8d8d8;
             }
         `;
         document.head.appendChild(style);
