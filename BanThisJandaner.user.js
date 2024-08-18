@@ -264,7 +264,7 @@
         if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
             let banData = JSON.parse(localStorage.getItem("banCode")) || {}; // 初始化為空物件
 
-            if (!banData[inputValue]) { // 避免重複添加
+            if (!banData[inputValue] == undefined) { // 避免重複添加
                 banData[inputValue] = "";
                 localStorage.setItem("banCode", JSON.stringify(banData));
                 location.reload();
