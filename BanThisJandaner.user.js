@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.33
+// @version      1.34
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -265,7 +265,9 @@
             if (banData[inputValue] == undefined) { // 避免重複添加
                 banData[inputValue] = "";
                 localStorage.setItem("banCode", JSON.stringify(banData));
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 100)
             } else {
                 alert("該用戶已經被屏蔽");
             }
