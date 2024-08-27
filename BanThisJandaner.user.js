@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         勞資不想看到你個sb
 // @namespace    http://tampermonkey.net/
-// @version      1.32
+// @version      1.33
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -256,13 +256,13 @@
     const myForm = document.getElementById('banForm');
     const myInput = document.querySelector('.ban-input');
 
-    myForm.addEventListener('submit', function(event) {
+    myForm.addEventListener('submit', function() {
         const inputValue = myInput.value;
-
+        
         if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
             let banData = JSON.parse(localStorage.getItem("banCode")) || {}; // 初始化為空物件
 
-            if (!banData[inputValue] == undefined) { // 避免重複添加
+            if (banData[inputValue] == undefined) { // 避免重複添加
                 banData[inputValue] = "";
                 localStorage.setItem("banCode", JSON.stringify(banData));
                 location.reload();
