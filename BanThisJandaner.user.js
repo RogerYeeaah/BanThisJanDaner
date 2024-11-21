@@ -219,7 +219,7 @@
     listDom += `
             </ul>
             <form id="banForm">
-                <input class="ban-input" type="text" placeholder="手動屏蔽" />
+                <input class="ban-input" type="text" placeholder="手動屏蔽(鍵入ID後, 猛擊Enter)" />
             </form>
         </div>
     `
