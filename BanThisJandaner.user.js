@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         勞資不想看到你個sb
+// @name         BanYouSb
 // @namespace    http://tampermonkey.net/
-// @version      1.34
+// @version      1.35
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       You
 // @match        *://jandan.net/*
@@ -141,11 +141,12 @@
         const author = lis[i].querySelector(".author strong");
         const authorName = author ? author.innerText : '';
 
-
         // 遍歷 banCode 物件中的所有鍵值對
         for (const [bannedAuthor, _] of Object.entries(banCode)) {
-            // 若作者姓名與 banCode 物件中的鍵值對匹配
-            if (authorName === bannedAuthor) {
+            // 若作者姓名與 banCode 物件中的鍵值對匹配 且 FBan Mode 為真
+            if (authorName === bannedAuthor && localStorage.getItem('FBan') === 'true') {
+                console.log(lis[i].remove());
+            } else if(authorName === bannedAuthor) {
                 // 獲取評論內容
                 const contentBox = lis[i].querySelector(".text");
                 const img = lis[i].querySelector("img");
@@ -194,8 +195,18 @@
     var counter = Object.keys(banCode).length
     var listDom = `
         <div class="banList">
-            <a class="toggleList">屏蔽列表 <span class="toggleList-show">+</span><span class="toggleList-hide">-</span></a>
-            <ul class="mainList">
+            <div class="toggleArea">
+                <div class="banModeSwitch" title="打開此開關完全屏蔽模式, 開啟後偷看功能關閉並完全屏蔽列表中的使用者(看不見任何與屏蔽使用者相關之項目)">
+                    <div class="switch ${localStorage.getItem('FBan') === 'true' ? 'active' : ''}" id="switch"></div>
+                    <span>FBan Mode</span>
+                </div>
+                屏蔽列表
+                <div class="toggleList">
+                    <span class="toggleList-show">+</span>
+                    <span class="toggleList-hide" style="display: none;">-</span>
+                </div>
+            </div>
+            <ul class="mainList" style="display: none;">
     `
 
     // 循环遍历 banCode 对象中的已屏蔽用户
@@ -208,7 +219,7 @@
     listDom += `
             </ul>
             <form id="banForm">
-                <input class="ban-input" type="text" placeholder="手動屏蔽(鍵入ID後, 猛擊Enter)" />
+                <input class="ban-input" type="text" placeholder="手動屏蔽" />
             </form>
         </div>
     `
@@ -239,6 +250,25 @@
         }
     });
 
+    // 获取 DOM 元素
+    const switcher = document.getElementById('switch');
+
+    switcher.addEventListener('click', (event) => {
+        if(localStorage.getItem('FBan') !== null) {
+            const isFBan = localStorage.getItem('FBan') === 'true';
+            localStorage.setItem('FBan', !isFBan);
+            switcher.classList.toggle('active', !isFBan);
+            location.reload();
+        } else {
+            if(confirm('打開此開關完全屏蔽模式, 開啟後偷看功能關閉並完全屏蔽列表中的使用者(看不見任何與被屏蔽使用者相關之項目)')) {
+                const isFBan = localStorage.getItem('FBan') === 'true';
+                localStorage.setItem('FBan', !isFBan);
+                switcher.classList.toggle('active', !isFBan);
+                location.reload();
+            }
+        }
+    })
+
     // 获取并缓存屏蔽用户列表 DOM 元素
     const toggleList = document.querySelector('.toggleList');
     if(toggleList != null) {
@@ -258,7 +288,7 @@
 
     myForm.addEventListener('submit', function() {
         const inputValue = myInput.value;
-        
+
         if (confirm("此屏蔽無法正確辨識身分, 換個暱稱就屏蔽不了了, 您確定要屏蔽 " + inputValue + " 嗎？")) {
             let banData = JSON.parse(localStorage.getItem("banCode")) || {}; // 初始化為空物件
 
@@ -294,19 +324,19 @@
                 display: inline-block;
                 position: relative;
                 font-size: 10px;
-            }
 
-            .peep img {
-                position: absolute;
-                left: calc(100% + 10px);
-                opacity: 0;
-                max-width: 250px !important;
-                pointer-events: none;
-            }
+                img {
+                    position: absolute;
+                    left: calc(100% + 10px);
+                    opacity: 0;
+                    max-width: 250px !important;
+                    pointer-events: none;
+                }
 
-            .peep:hover img{
-                opacity: 1 !important;
-                transition: .5s ease;
+                :hover img {
+                    opacity: 1 !important;
+                    transition: .5s ease;
+                }
             }
 
             .banList {
@@ -323,34 +353,42 @@
                 left: calc(100% - (100vw - 984px - 30px) / 2);
             }
 
-            .toggleList {
+            .toggleArea {
                 padding: 5px;
                 position: relative;
                 text-align: center;
                 width: 100%;
                 border-radius: 5px;
                 background: #bababa;
-                color: white;
+                color: #333;
                 font-weight: bold;
                 pointer-events: auto;
-            }
 
-            .toggleList-show {
-                display: inline-block;
-                position: absolute;
-                width: 20px;
-                height: 20px;
-                right: 5px;
-            }
+                .toggleList {
+                    display: inline-block;
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    right: 5px;
+                }
 
-            .toggleList-hide {
-                position: absolute;
-                width: 20px;
-                height: 20px;
-                top: 5px;
-                right: 5px;
-                background: #bababa;
-                display: none;
+                .toggleList-show,
+                .toggleList-hide {
+                    position: relative;
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    background: #bababa;
+
+                    &:hover {
+                        color: #666;
+                    }
+                }
+
+                .toggleList-hide {
+                    position: absolute;
+                    top: 0;
+                }
             }
 
             .mainList {
@@ -393,18 +431,62 @@
                 left: 0;
                 width: 100%;
                 pointer-events: auto;
-            }
-            #banForm .ban-input {
-                position: relative;
-                width: 100%;
-                border-color: #d8d8d8;
-                border-width: 0px 00px 1px 0px;
-            }
-            #banForm .ban-input:focus {
-                outline: none;
+
+                .ban-input {
+                    position: relative;
+                    width: 100%;
+                    border-color: #d8d8d8;
+                    border-width: 0px 00px 1px 0px;
+                }
+                .ban-input:focus {
+                    outline: none;
+                }
             }
             #banForm .ban-input::placeholder {
                 color: #d8d8d8;
+            }
+            .banModeSwitch {
+                position: absolute;
+                top: 5px;
+                height: 20px;
+
+                .switch {
+                    position: relative;
+                    width: 20px;
+                    height: 10px;;
+                    border-radius: 10px;
+                    background: rgb(255 255 255 / 40%);
+
+                    &:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        top: 2px;
+                        left: 2px;
+                        height: 6px;
+                        width: 6px;
+                        border-radius: 10px;
+                        background: rgb(0 0 0 / 20%);
+                    }
+
+                    &.active {
+                        background: rgb(187 255 204 / 40%);
+
+                        &:after {
+                            left: auto;
+                            right: 2px;
+                            background: rgb(22 165 0 / 40%);
+                        }
+                    }
+                }
+
+                span {
+                    padding-top: 2px;
+                    display: block;
+                    color: #333 !important;
+                    font-size: 7px;
+                    font-weight: 100;
+                }
             }
         `;
         document.head.appendChild(style);
