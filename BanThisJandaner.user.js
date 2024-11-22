@@ -333,7 +333,7 @@
                     pointer-events: none;
                 }
 
-                :hover img {
+                &:hover img {
                     opacity: 1 !important;
                     transition: .5s ease;
                 }
