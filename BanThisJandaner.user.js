@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         BanYouSb
 // @namespace    http://tampermonkey.net/
-// @version      1.36
+// @version      1.37
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
-// @author       You
+// @author       RogerYeah
 // @match        *://jandan.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=jandan.net
 // @grant        none
@@ -108,30 +108,53 @@
         }
     }
 
+    // 定義吐槽屏蔽函式
     function tucaoHandle(e) {
-        var tucaoRows = e.querySelectorAll('.tucao-list .tucao-row');
-        var tucaoHotRows = e.querySelectorAll('.tucao-hot .tucao-row');
-        var banCode = JSON.parse(localStorage.getItem("banCode"));
+        const bannedUsers = JSON.parse(localStorage.getItem("banCode"));
+        const bannedUsernames = Object.keys(bannedUsers);
+        const isFBan = localStorage.getItem('FBan') === 'true';
+        const tucaoList = e.querySelectorAll('.tucao-list .tucao-row');
+        const tucaoHotList = e.querySelectorAll('.tucao-hot .tucao-row');
+        let rowsToDelete = [];
 
-        // 取得所有鍵名並放入一個陣列
-        const keys = Object.keys(banCode);
+        if (!bannedUsers) return; // 如果 banCode 為空，則直接返回
 
-        // 遍歷鍵名陣列，同時取得索引
-        for (let i = 0; i < keys.length; i++) {
-            const item = keys[i];
-            for(let ri = 0; ri < tucaoRows.length; ri++) {
-                const tucaoAuthor = tucaoRows[ri].querySelector('.tucao-author');
-                const textContent = tucaoAuthor.textContent;
-                textContent.includes(item) ? tucaoRows[ri].remove() : '';
-            }
-            for(let hri = 0; hri < tucaoHotRows.length; hri++) {
-                const tucaoAuthor = tucaoHotRows[hri].querySelector('.tucao-author');
-                const textContent = tucaoAuthor.textContent;
-                if (textContent.includes(item)) {
-                    tucaoHotRows[tucaoHotRows.length === 1 ? 0 : hri].parentNode.remove();
+        bannedUsernames.forEach(bannedUser => {
+            rowsToDelete = [];
+            // 找到所有需要刪除的元素，並存儲到 rowsToDelete 陣列中
+            tucaoList.forEach(row => {
+                const tucaoAuthor = row.querySelector('.tucao-author');
+                if (tucaoAuthor && tucaoAuthor.textContent.includes(bannedUser)) {
+                    rowsToDelete.push(row.id);
                 }
-            }
+            });
 
+            // 熱榜屏蔽
+            tucaoHotList.forEach(row => {
+                const tucaoAuthor = row.querySelector('.tucao-author');
+                if (tucaoAuthor && tucaoAuthor.textContent.includes(bannedUser)) {
+                    rowsToDelete.push(row.id);
+                }
+            });
+        });
+
+        if (isFBan) {
+            rowsToDelete.forEach(row => {
+                document.getElementById(row).remove()
+            });
+        } else {
+            rowsToDelete.forEach(row => {
+                var rowItem = document.getElementById(row);
+                var contentBox = rowItem.querySelector(".tucao-content");
+                var content = contentBox.textContent;
+
+                document.getElementById(row).querySelector(".tucao-content").innerHTML = `
+                    <del class="delete">
+                        <span class="math-inline">已屏蔽</span>
+                    </del>
+                    <i class="peep" title="${content}">偷看一下(懸停)</i>
+                `;
+            });
         }
     }
 
@@ -153,7 +176,14 @@
                 const content = contentBox.querySelector('p:not(.bad_content)').textContent.replace(/<br>/g, ' ');
 
                 // 將評論內容替換為 "[已屏蔽]" 標記
-                contentBox.innerHTML = `<del class="delete"><span class="math-inline">${authorName} - 已屏蔽</span></del><i class="peep" title="${content}">偷看一下(懸停) ${img != null ? `<img style="opacity: 0;" src="${img.src}" alt="pic" />`: ''}</i>`;
+                contentBox.innerHTML = `
+                    <del class="delete">
+                        <span class="math-inline">${authorName} - 已屏蔽</span>
+                    </del>
+                    <i class="peep" title="${content}">偷看一下(懸停)
+                        ${img != null ? `<img style="opacity: 0;" src="${img.src}" alt="pic" />`: ''}
+                    </i>
+                `;
 
                 break;
             }
@@ -209,7 +239,7 @@
             <ul class="mainList" style="display: none;">
     `
 
-    // 循环遍历 banCode 对象中的已屏蔽用户
+    // 循環遍歷 banCode 對象中的已屏蔽用戶
     for (var li = 0; li < counter; li++) {
         listDom += `
                 <li class="mainList-item">${Object.keys(banCode)[li]} <a class="unban" href="javascript: void();">x</a></li>
@@ -224,13 +254,13 @@
         </div>
     `
 
-    // 获取 DOM 元素
+    // 獲取 DOM 元素
     const wrapper = document.getElementById('wrapper');
     const listDomElement = document.createElement('div');
     listDomElement.innerHTML = listDom;
     wrapper.appendChild(listDomElement);
 
-    // 添加点击事件监听器，用于处理删除按钮的点击
+    // 添加點擊事件監聽器，用於處理刪除按鈕的點擊
     wrapper.addEventListener('click', (event) => {
         if (event.target.classList.contains('unban') && !event.target.classList.contains('clicked')) {
             const username = event.target.parentNode.textContent.trim().replace(' x', '');
@@ -250,7 +280,7 @@
         }
     });
 
-    // 获取 DOM 元素
+    // 獲取 DOM 元素
     const switcher = document.getElementById('switch');
 
     switcher.addEventListener('click', (event) => {
@@ -269,10 +299,10 @@
         }
     })
 
-    // 获取并缓存屏蔽用户列表 DOM 元素
+    // 獲取並緩存屏蔽用戶列表 DOM 元素
     const toggleList = document.querySelector('.toggleList');
     if(toggleList != null) {
-        // 添加点击事件监听器，用于展开/收起屏蔽用户列表
+        // 添加點擊事件監聽器，用於展開/收起屏蔽用戶列表
         toggleList.addEventListener('click', function() {
             const secondSpan = this.querySelector('span:nth-of-type(2)');
             const ul = document.querySelector('.mainList');
@@ -293,7 +323,7 @@
             let banData = JSON.parse(localStorage.getItem("banCode")) || {}; // 初始化為空物件
 
             if (banData[inputValue] == undefined) { // 避免重複添加
-                banData[inputValue] = "";
+                banData[inputValue] = null;
                 localStorage.setItem("banCode", JSON.stringify(banData));
                 setTimeout(() => {
                     location.reload();
@@ -305,9 +335,9 @@
     });
 
     setTimeout(() => {
-        // 创建 style 元素
+        // 創建 style 元素
         var style = document.createElement('style');
-         // 创建文本节点，包含 CSS 规则
+         // 創建文本，包含 CSS 規則
         style.innerHTML = `
             .commentlist .row {
                 overflow: visible;
@@ -318,6 +348,12 @@
                 margin-bottom: 20px;
                 margin-top: 7px;
                 margin-right: 5px;
+            }
+            .tucao-content {
+                .delete {
+                    display: inline-block;
+                    margin: 0;
+                }
             }
 
             .peep {
