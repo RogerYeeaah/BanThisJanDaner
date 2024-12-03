@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BanYouSb
 // @namespace    http://tampermonkey.net/
-// @version      1.37
+// @version      1.38
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       RogerYeah
 // @match        *://jandan.net/*
@@ -349,6 +349,7 @@
                 margin-top: 7px;
                 margin-right: 5px;
             }
+
             .tucao-content {
                 .delete {
                     display: inline-block;
@@ -406,24 +407,24 @@
                     width: 20px;
                     height: 20px;
                     right: 5px;
-                }
 
-                .toggleList-show,
-                .toggleList-hide {
-                    position: relative;
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    background: #bababa;
+                    &-show,
+                    &-hide {
+                        position: relative;
+                        display: inline-block;
+                        width: 20px;
+                        height: 20px;
+                        background: #bababa;
 
-                    &:hover {
-                        color: #666;
+                        &:hover {
+                            color: #666;
+                        }
                     }
-                }
 
-                .toggleList-hide {
-                    position: absolute;
-                    top: 0;
+                    &-hide {
+                        position: absolute;
+                        top: 0;
+                    }
                 }
             }
 
@@ -437,28 +438,28 @@
                 color: gray;
                 overflow: auto;
                 height: calc(100vh - 196px);
-            }
 
-            .mainList-item {
-                margin-bottom: 4px;
-                padding-bottom: 4px;
-                width: 100%;
-                border-bottom: 1px solid gray;
-                font-size: 12px;
-                white-space:nowrap;
-                text-overflow:ellipsis;
-                -o-text-overflow:ellipsis;
-                overflow: hidden;
-                max-width: 100%;
-                padding-right: 20px;
-                box-sizing: border-box;
-            }
+                &-item {
+                    margin-bottom: 4px;
+                    padding-bottom: 4px;
+                    width: 100%;
+                    border-bottom: 1px solid gray;
+                    font-size: 12px;
+                    white-space:nowrap;
+                    text-overflow:ellipsis;
+                    -o-text-overflow:ellipsis;
+                    overflow: hidden;
+                    max-width: 100%;
+                    padding-right: 20px;
+                    box-sizing: border-box;
 
-            .unban {
-                pointer-events: auto;
-                cursor: pointer;
-                position: absolute;
-                right: 0;
+                    .unban {
+                        pointer-events: auto;
+                        cursor: pointer;
+                        position: absolute;
+                        right: 0;
+                    }
+                }
             }
 
             #banForm {
@@ -473,14 +474,18 @@
                     width: 100%;
                     border-color: #d8d8d8;
                     border-width: 0px 00px 1px 0px;
-                }
-                .ban-input:focus {
-                    outline: none;
+
+                    &:focus {
+                        outline: none;
+                    }
+
+                    &::placeholder {
+                        color: #d8d8d8;
+                    }
                 }
             }
-            #banForm .ban-input::placeholder {
-                color: #d8d8d8;
-            }
+
+            //屏蔽按鈕樣式
             .banModeSwitch {
                 position: absolute;
                 top: 5px;
@@ -523,6 +528,11 @@
                     font-size: 7px;
                     font-weight: 100;
                 }
+            }
+
+            // to top 層級index修正
+            #nav_top {
+                index: 99999;
             }
         `;
         document.head.appendChild(style);
