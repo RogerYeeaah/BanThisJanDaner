@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BanYouSb
 // @namespace    http://tampermonkey.net/
-// @version      1.38
+// @version      1.39
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       RogerYeah
 // @match        *://jandan.net/*
@@ -485,7 +485,6 @@
                 }
             }
 
-            //屏蔽按鈕樣式
             .banModeSwitch {
                 position: absolute;
                 top: 5px;
@@ -530,7 +529,6 @@
                 }
             }
 
-            // to top 層級index修正
             #nav_top {
                 index: 99999;
             }
