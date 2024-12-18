@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BanYouSb
 // @namespace    http://tampermonkey.net/
-// @version      1.39
+// @version      1.40
 // @description  通過網頁操作, 達成屏蔽與解除屏蔽使用者
 // @author       RogerYeah
 // @match        *://jandan.net/*
