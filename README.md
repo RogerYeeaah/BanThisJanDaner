@@ -16,3 +16,4 @@
 11月21日 - [ver_1.38] : 修正to top 層級index</br>
 11月21日 - [ver_1.39] : css註解移除</br>
 11月21日 - [ver_1.40] : code優化</br>
+11月21日 - [ver_1.41] : 修正to top 層級index</br>
